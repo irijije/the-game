@@ -4,6 +4,7 @@ import json
 import os
 import time
 import sys
+import io
 from .ui import display_board
 
 
@@ -37,6 +38,7 @@ def listen_to_server(client_socket):
     os._exit(1)
 
 def start_client():
+    sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     host = input("Enter server IP (default: 127.0.0.1): ") or '127.0.0.1'
     port_str = input("Enter server port (default: 12345): ") or '12345'
     try:
@@ -89,18 +91,14 @@ def start_client():
             elif action == 'end':
                 message = {'action': 'end_turn'}
                 client_socket.sendall((json.dumps(message) + '\n').encode('utf-8'))
-            elif action == 'say':
-                chat_text = " ".join(parts[1:])
-                if chat_text:
-                    message = {'action': 'chat', 'text': chat_text}
-                    client_socket.sendall((json.dumps(message) + '\n').encode('utf-8'))
-                else:
-                    print("You must provide a message to say.")
             elif action == 'help':
                 message = {'action': 'help'}
                 client_socket.sendall((json.dumps(message) + '\n').encode('utf-8'))
             else:
-                print("Unknown command. Type 'help' for a list of commands.")
+                chat_text = command.strip()
+                if chat_text:
+                    message = {'action': 'chat', 'text': chat_text}
+                    client_socket.sendall((json.dumps(message) + '\n').encode('utf-8'))
         except (EOFError, KeyboardInterrupt):
             print("\nExiting.")
             break

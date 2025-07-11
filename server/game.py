@@ -11,12 +11,15 @@ GAME_RULES = """
 - Turn:
   - On your turn, you MUST play at least 2 cards.
   - If the deck is empty, you only need to play 1 card.
-  - You can play more than 2 cards if you wish.
 - Backwards Trick (The "10 Rule"):
   - You can play a card that is exactly 10 lower on an ASCENDING pile.
   - You can play a card that is exactly 10 higher on a DESCENDING pile.
-  - This is the key to winning!
-- Communication: You can't reveal your exact card numbers. Use chat to give hints!
+
+*** Commands ***
+- play <card> <pile>: Play a card on a pile (e.g., play 25 1).
+- end: End your turn.
+- help: Show this help message.
+- To chat, just type your message and press Enter.
 """
 
 class Game:
@@ -31,6 +34,7 @@ class Game:
         self.game_started = False
         self.game_over = False
         self.chat_history = []
+        self.last_move = None
         self.lock = threading.Lock()
 
 
@@ -74,7 +78,8 @@ class Game:
             'my_name': self.players[player_id]['name'],
             'message': self.players[player_id]['message'],
             'game_over': self.game_over,
-            'chat_history': self.chat_history
+            'chat_history': self.chat_history,
+            'last_move': self.last_move
         }
         self.players[player_id]['message'] = '' # Clear message after sending
         return state
@@ -109,7 +114,13 @@ class Game:
             self.piles[pile_name] = card
             self.players[player_id]['hand'].remove(card)
             self.cards_played_this_turn += 1
-            self.players[player_id]['message'] = f"Played {card} on pile {pile_num}."
+            self.players[player_id]['message'] = f"Played {card} on pile {pile_num} ({current_pile_value} -> {card})."
+            self.last_move = {
+                'player_name': self.players[player_id]['name'],
+                'card': card,
+                'pile_num': pile_num,
+                'old_pile_value': current_pile_value
+            }
         else:
             self.players[player_id]['message'] = "Invalid move."
 

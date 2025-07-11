@@ -50,8 +50,9 @@ On your turn, enter commands in your client terminal:
   - Example: `play 25 1` (Plays the card '25' on ascending pile 1)
 - **End your turn**: `end`
   - You must play at least two cards per turn (or one if the deck is empty).
-- **Chat with players**: `say <your message>`
-  - Example: `say I can make a big jump on a descending pile.`
+- **Chat with players**: Just type your message and press Enter.
+  - Example: `I can make a big jump on a descending pile.`
+  - If your message starts with `play`, `end`, or `help`, it will be treated as a command.
 - **View rules**: `help`
   - Displays the game rules and commands.
 

@@ -12,6 +12,7 @@ def display_board(state):
     my_player_id = state.get('my_player_id', '')
     message = state.get('message', '')
     chat_history = state.get('chat_history', [])
+    last_move = state.get('last_move')
 
     # Header
     print("╔══════════════════════════════════════════════════════╗")
@@ -21,17 +22,31 @@ def display_board(state):
     print("────────────────────────────────────────────────────────")
 
     # Piles (Game Board)
+    pile_map = {1: 'asc1', 2: 'asc2', 3: 'desc1', 4: 'desc2'}
+    pile_vals = {}
+    for i in range(1, 5):
+        pile_name = pile_map[i]
+        val = piles.get(pile_name, 'X')
+        is_last_move = last_move and last_move.get('pile_num') == i
+        pile_vals[pile_name] = f"{val}{'*' if is_last_move else ''}"
+
     print("                --- GAME BOARD ---")
-    print("   Ascending :  [1] {:<3}      [2] {:<3}".format(piles.get('asc1', 'X'), piles.get('asc2', 'X')))
-    print("   Descending:  [3] {:<3}      [4] {:<3}".format(piles.get('desc1', 'X'), piles.get('desc2', 'X')))
+    print("   Ascending :  [1] {:<4}     [2] {:<4}".format(pile_vals['asc1'], pile_vals['asc2']))
+    print("   Descending:  [3] {:<4}     [4] {:<4}".format(pile_vals['desc1'], pile_vals['desc2']))
     print("────────────────────────────────────────────────────────")
+    
+    # System Message
+    if message:
+        print(f"Message: {message}")
+        print("--------------------------------------------------------")
     
     # Player Info
     player_list = []
     for pid, info in players_info.items():
         player_str = f"{info.get('name', '?')} ({info.get('hand_size', '?')} cards)"
         if pid == my_player_id:
-            player_str = f"▶ {player_str} ◀"
+            player_str = f"▶ {player_str}"
+        
         player_list.append(player_str)
     
     print("Players: " + " | ".join(player_list))
@@ -51,7 +66,3 @@ def display_board(state):
             print(f"  {chat_msg}")
         print("--------------------------------------------------------")
 
-    # System Message
-    if message:
-        print(f"Message: {message}")
-        print("--------------------------------------------------------")
